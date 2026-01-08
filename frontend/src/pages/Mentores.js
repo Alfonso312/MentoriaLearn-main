@@ -10,7 +10,7 @@ function Mentores() {
       nombre: 'Ing. Maria Guitierrez Aquino',
       especialidad: 'API Rest full, Spring Boot y Spring Framework, Base de datos, Integración',
       experiencia: '10 años',
-      imagen: 'https://newtonendigital.com/wp-content/uploads/2025/03/Mariclet-Fernandez-Profesora-de-Fisica-y-Matematica.jpg',
+      imagen: 'images/profesoraspring.webp',
       descripcion: 'Especialista en desarrollo backend integrando las tecnologías de última generación en proyectos de software. Ha liderado equipos en empresas internacionales y es reconocida por su enfoque práctico y didáctico en la enseñanza de frameworks modernos.',
       formacion: 'Ingeniera de Sistemas por la Universidad Nacional de Ingeniería',
       cursos: ['Spring Boot desde Cero', 'Integración de APIs', 'Bases de Datos'],
@@ -74,7 +74,7 @@ function Mentores() {
                 <span>{mentor.experiencia} de experiencia</span>
               </div>
               <p className="text-gray-600 mb-4">{mentor.descripcion}</p>
-              <Link 
+              <Link
                 to="#"
                 onClick={() => setMentorSeleccionado(mentor)}
                 className="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-block text-center"
