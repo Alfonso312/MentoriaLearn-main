@@ -27,7 +27,7 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
+      <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <div className="min-h-screen" style={backgroundStyle}>
           <Navbar />
           <main className="container mx-auto px-4 py-8">
@@ -41,13 +41,13 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/comunidad" element={<Comunidad />} />
-              <Route 
-                path="/estudiantes" 
+              <Route
+                path="/estudiantes"
                 element={
                   <ProtectedRoute allowedRoles={['ADMIN', 'MENTOR']}>
                     <Estudiantes />
                   </ProtectedRoute>
-                } 
+                }
               />
               <Route path="/perfil" element={<Perfil />} />
             </Routes>

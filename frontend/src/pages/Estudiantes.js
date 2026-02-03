@@ -169,6 +169,19 @@ function Estudiantes() {
     }
   };
 
+
+  const handleDeleteUsuario = async (id) => {
+    if (window.confirm('¿Estás seguro de que quieres eliminar este usuario auto-registrado?')) {
+      try {
+        await authService.deleteUser(id);
+        setMessage({ type: 'success', text: 'Usuario eliminado exitosamente' });
+        loadUsuariosEstudiantes();
+      } catch (error) {
+        setMessage({ type: 'error', text: 'Error al eliminar usuario' });
+      }
+    }
+  };
+
   const handleDescargarPDF = (insc) => {
     const doc = new jsPDF();
     const fecha = new Date().toLocaleString();
@@ -245,8 +258,8 @@ function Estudiantes() {
       {/* Mensaje de estado */}
       {message.text && (
         <div className={`mb-6 p-4 rounded-lg ${message.type === 'success'
-            ? 'bg-green-100 text-green-700 border border-green-200'
-            : 'bg-red-100 text-red-700 border border-red-200'
+          ? 'bg-green-100 text-green-700 border border-green-200'
+          : 'bg-red-100 text-red-700 border border-red-200'
           }`}>
           {message.text}
         </div>
@@ -387,8 +400,8 @@ function Estudiantes() {
                 type="submit"
                 disabled={loading}
                 className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${loading
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-indigo-600 hover:bg-indigo-700'
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-700'
                   } text-white`}
               >
                 {loading ? 'Registrando...' : 'Registrar Estudiante'}
@@ -496,7 +509,16 @@ function Estudiantes() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <span className="text-gray-400">No editable</span>
+                    {isAdmin && isAdmin() ? (
+                      <button
+                        onClick={() => handleDeleteUsuario(usuario.id)}
+                        className="text-red-600 hover:text-red-900"
+                      >
+                        Eliminar
+                      </button>
+                    ) : (
+                      <span className="text-gray-400">No editable</span>
+                    )}
                   </td>
                 </tr>
               ))}

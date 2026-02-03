@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://18.119.130.211:8080';
-const AUTH_URL = 'http://18.119.130.211:8080/auth';
+const API_URL = 'http://localhost:8080';
+const AUTH_URL = 'http://localhost:8080/auth';
 
 const api = axios.create({
     baseURL: API_URL,
@@ -30,6 +30,7 @@ export const authService = {
     register: (userData) => authApi.post('/register', userData),
     checkAuth: () => authApi.get('/check'),
     getUsersByRole: (role) => authApi.get(`/users/${role}`),
+    deleteUser: (id) => authApi.delete(`/users/${id}`),
 };
 
 export const contactoService = {

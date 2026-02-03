@@ -1,7 +1,9 @@
 package com.mentoria.controller;
 
 import com.mentoria.model.Estudiante;
+import com.mentoria.model.Inscripcion;
 import com.mentoria.repository.EstudianteRepository;
+import com.mentoria.repository.InscripcionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,12 +12,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/estudiantes")
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001", "http://localhost:3002", 
-                       "http://18.119.130.211", "http://18.119.130.211:80"})
+@CrossOrigin(origins = { "http://localhost:3000", "http://localhost:3001", "http://localhost:3002",
+        "http://18.119.130.211", "http://18.119.130.211:80" })
 public class EstudianteController {
 
     @Autowired
     private EstudianteRepository estudianteRepository;
+
+    @Autowired
+    private InscripcionRepository inscripcionRepository;
 
     @GetMapping
     public List<Estudiante> getAllEstudiantes() {
@@ -35,7 +40,8 @@ public class EstudianteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Estudiante> updateEstudiante(@PathVariable Long id, @RequestBody Estudiante estudianteDetails) {
+    public ResponseEntity<Estudiante> updateEstudiante(@PathVariable Long id,
+            @RequestBody Estudiante estudianteDetails) {
         return estudianteRepository.findById(id)
                 .map(estudiante -> {
                     estudiante.setNombre(estudianteDetails.getNombre());
@@ -54,9 +60,11 @@ public class EstudianteController {
     public ResponseEntity<?> deleteEstudiante(@PathVariable Long id) {
         return estudianteRepository.findById(id)
                 .map(estudiante -> {
+                    java.util.List<Inscripcion> inscripciones = inscripcionRepository.findByEstudiante(estudiante);
+                    inscripcionRepository.deleteAll(inscripciones);
                     estudianteRepository.delete(estudiante);
                     return ResponseEntity.ok().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-} 
+}

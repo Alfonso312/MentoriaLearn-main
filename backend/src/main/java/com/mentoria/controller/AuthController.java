@@ -33,33 +33,29 @@ public class AuthController {
                     response.put("success", true);
                     response.put("message", "Login exitoso");
                     response.put("user", Map.of(
-                        "id", usuario.getId(),
-                        "username", usuario.getUsername(),
-                        "email", usuario.getEmail(),
-                        "role", usuario.getRole()
-                    ));
+                            "id", usuario.getId(),
+                            "username", usuario.getUsername(),
+                            "email", usuario.getEmail(),
+                            "role", usuario.getRole()));
                     return ResponseEntity.ok(response);
                 })
                 .orElse(ResponseEntity.badRequest().body(Map.of(
-                    "success", false,
-                    "message", "Credenciales inválidas"
-                )));
+                        "success", false,
+                        "message", "Credenciales inválidas")));
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Usuario usuario) {
         if (usuarioRepository.findByUsername(usuario.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "El nombre de usuario ya existe"
-            ));
+                    "success", false,
+                    "message", "El nombre de usuario ya existe"));
         }
 
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "El email ya está registrado"
-            ));
+                    "success", false,
+                    "message", "El email ya está registrado"));
         }
 
         // Codificar la contraseña
@@ -71,26 +67,24 @@ public class AuthController {
         }
 
         Usuario savedUsuario = usuarioRepository.save(usuario);
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("success", true);
         response.put("message", "Usuario registrado exitosamente");
         response.put("user", Map.of(
-            "id", savedUsuario.getId(),
-            "username", savedUsuario.getUsername(),
-            "email", savedUsuario.getEmail(),
-            "role", savedUsuario.getRole()
-        ));
-        
+                "id", savedUsuario.getId(),
+                "username", savedUsuario.getUsername(),
+                "email", savedUsuario.getEmail(),
+                "role", savedUsuario.getRole()));
+
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/check")
     public ResponseEntity<?> checkAuth() {
         return ResponseEntity.ok(Map.of(
-            "authenticated", true,
-            "message", "Sistema de autenticación funcionando"
-        ));
+                "authenticated", true,
+                "message", "Sistema de autenticación funcionando"));
     }
 
     @GetMapping("/users/{role}")
@@ -100,9 +94,18 @@ public class AuthController {
             return ResponseEntity.ok(usuarios);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Error al obtener usuarios: " + e.getMessage()
-            ));
+                    "success", false,
+                    "message", "Error al obtener usuarios: " + e.getMessage()));
         }
     }
-} 
+
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return usuarioRepository.findById(id)
+                .map(usuario -> {
+                    usuarioRepository.delete(usuario);
+                    return ResponseEntity.ok(Map.of("success", true, "message", "Usuario eliminado exitosamente"));
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+}

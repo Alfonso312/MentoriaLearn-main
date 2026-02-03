@@ -84,6 +84,7 @@ const levelColors = {
 function Cursos() {
   const [modalOpen, setModalOpen] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
+  const [selectedHorario, setSelectedHorario] = useState('');
   const navigate = useNavigate();
   const { isAuthenticated, user, isStudent, isAdmin } = useAuth();
   const [showPdfButton, setShowPdfButton] = useState(false);
@@ -111,6 +112,7 @@ function Cursos() {
 
   const handleVerDetalles = (curso) => {
     setCursoSeleccionado(curso);
+    setSelectedHorario('');
     setModalOpen(true);
   };
 
@@ -140,9 +142,14 @@ function Cursos() {
           const createRes = await estudianteService.create(nuevoEstudiante);
           estudiante = createRes.data;
         }
+        if (!selectedHorario) {
+          alert('Por favor, selecciona un horario para inscribirte.');
+          return;
+        }
         await inscripcionService.create({
           estudiante: { id: estudiante.id },
-          curso: { id: cursoSeleccionado.id }
+          curso: { id: cursoSeleccionado.id },
+          horario: selectedHorario,
         });
         setLastInscripcion({
           estudiante: user,
@@ -170,10 +177,11 @@ function Cursos() {
     doc.text(`Curso: ${inscripcion.curso?.titulo}`, 20, 65);
     doc.text(`Mentor: ${inscripcion.curso?.mentor}`, 20, 75);
     doc.text(`Nivel: ${inscripcion.curso?.nivel}`, 20, 85);
+    doc.text(`Horario: ${inscripcion.horario || 'No especificado'}`, 20, 95);
     if (inscripcion.curso?.horarios) {
-      doc.text('Horarios:', 20, 95);
+      doc.text('Horarios Disponibles del Curso:', 20, 105);
       inscripcion.curso.horarios.forEach((h, i) => {
-        doc.text(`- ${h}`, 30, 105 + i * 10);
+        doc.text(`- ${h}`, 30, 115 + i * 10);
       });
     }
     doc.save('comprobante_inscripcion.pdf');
@@ -350,11 +358,17 @@ function Cursos() {
             <p className="text-gray-700 mb-4">{cursoSeleccionado.detalles}</p>
             <div className="mb-4">
               <h3 className="font-semibold text-gray-900 mb-1">Horarios Disponibles:</h3>
-              <ul className="list-disc list-inside text-gray-700">
+              <select
+                value={selectedHorario}
+                onChange={(e) => setSelectedHorario(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 mt-1"
+                required
+              >
+                <option value="">-- Selecciona un horario --</option>
                 {cursoSeleccionado.horarios.map((horario, idx) => (
-                  <li key={idx}>{horario}</li>
+                  <option key={idx} value={horario}>{horario}</option>
                 ))}
-              </ul>
+              </select>
             </div>
             <button
               className="w-full py-2 px-4 rounded-lg font-semibold transition-colors bg-green-600 text-white hover:bg-green-700"
