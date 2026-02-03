@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 function Navbar() {
   const { user, isAuthenticated, logout, canManageStudents, isStudent } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -31,7 +32,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white shadow-lg relative"> {/* Added relative for absolute positioning of mobile menu if needed, though standard flow is fine */}
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-28">
           <Link to="/" className="flex items-center space-x-2 flex-shrink-0">
@@ -40,33 +41,17 @@ function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center space-x-8 flex-1 justify-center">
-            <Link to="/" className={navLinkClass('/')}>
-              Inicio
-            </Link>
-            <Link to="/mentores" className={navLinkClass('/mentores')}>
-              Mentores
-            </Link>
-            <Link to="/programas" className={navLinkClass('/programas')}>
-              Programas
-            </Link>
-            <Link to="/cursos" className={navLinkClass('/cursos')}>
-              Cursos
-            </Link>
-            <Link to="/contacto" className={navLinkClass('/contacto')}>
-              Contacto
-            </Link>
-            <Link to="/comunidad" className={navLinkClass('/comunidad')}>
-              Comunidad
-            </Link>
+            <Link to="/" className={navLinkClass('/')}>Inicio</Link>
+            <Link to="/mentores" className={navLinkClass('/mentores')}>Mentores</Link>
+            <Link to="/programas" className={navLinkClass('/programas')}>Programas</Link>
+            <Link to="/cursos" className={navLinkClass('/cursos')}>Cursos</Link>
+            <Link to="/contacto" className={navLinkClass('/contacto')}>Contacto</Link>
+            <Link to="/comunidad" className={navLinkClass('/comunidad')}>Comunidad</Link>
             {canManageStudents() && (
-              <Link to="/estudiantes" className={navLinkClass('/estudiantes')}>
-                Estudiantes
-              </Link>
+              <Link to="/estudiantes" className={navLinkClass('/estudiantes')}>Estudiantes</Link>
             )}
             {isAuthenticated() && isStudent() && (
-              <Link to="/perfil" className={navLinkClass('/perfil')}>
-                Mi Perfil
-              </Link>
+              <Link to="/perfil" className={navLinkClass('/perfil')}>Mi Perfil</Link>
             )}
           </div>
 
@@ -106,29 +91,92 @@ function Navbar() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link
-                  to="/register"
-                  className={navLinkClass('/register')}
-                >
-                  Registrarse
-                </Link>
-                <Link
-                  to="/login"
-                  className="bg-black/70 text-white px-4 py-2 rounded-full hover:bg-black transition-colors"
-                >
+                <Link to="/register" className={navLinkClass('/register')}>Registrarse</Link>
+                <Link to="/login" className="bg-black/70 text-white px-4 py-2 rounded-full hover:bg-black transition-colors">
                   Iniciar Sesión
                 </Link>
               </div>
             )}
           </div>
+
           {/* Mobile menu button */}
-          <button className="md:hidden text-gray-700 hover:text-black/70">
-            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          <button
+            className="md:hidden text-gray-700 hover:text-black/70 focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
             </svg>
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu Content */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 shadow-inner px-4 pt-2 pb-6 space-y-4">
+
+          {/* Priority: Login/Register/User Info */}
+          <div className="flex flex-col space-y-3 pb-4 border-b border-gray-100">
+            {isAuthenticated() ? (
+              <div className="flex flex-col space-y-3">
+                <div className="flex items-center space-x-3 p-2 bg-indigo-50 rounded-lg">
+                  <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                    {user?.username?.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <div className="font-semibold">{user?.username}</div>
+                    <div className="text-xs text-gray-500">{getRoleDisplayName(user?.role)}</div>
+                  </div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left text-red-600 font-medium py-2 px-2 hover:bg-red-50 rounded"
+                >
+                  Cerrar Sesión
+                </button>
+              </div>
+            ) : (
+              <div className="flex flex-col space-y-3">
+                <Link
+                  to="/login"
+                  className="w-full bg-black/70 text-white text-center py-3 rounded-lg font-bold hover:bg-black"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link
+                  to="/register"
+                  className="w-full border border-gray-300 text-gray-700 text-center py-3 rounded-lg font-medium hover:bg-gray-50"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Registrarse
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Other Page Links ("Plus") */}
+          <div className="flex flex-col space-y-2">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1 px-2">Navegación</h3>
+            <Link to="/" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Inicio</Link>
+            <Link to="/mentores" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Mentores</Link>
+            <Link to="/programas" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Programas</Link>
+            <Link to="/cursos" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Cursos</Link>
+            <Link to="/comunidad" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Comunidad</Link>
+            <Link to="/contacto" className="text-gray-700 hover:text-indigo-600 py-2 px-2 rounded hover:bg-gray-50 font-medium" onClick={() => setIsMobileMenuOpen(false)}>Contacto</Link>
+            {canManageStudents() && (
+              <Link to="/estudiantes" className="text-indigo-600 hover:bg-indigo-50 py-2 px-2 rounded font-bold" onClick={() => setIsMobileMenuOpen(false)}>Estudiantes</Link>
+            )}
+            {isAuthenticated() && isStudent() && (
+              <Link to="/perfil" className="text-indigo-600 hover:bg-indigo-50 py-2 px-2 rounded font-bold" onClick={() => setIsMobileMenuOpen(false)}>Mi Perfil</Link>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
